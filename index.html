@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#242424">
+<meta name="description" content="Cotizador de carpintería con precios editables">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<title>Cotizador Carpintería</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f3f3f1;color:#171717}
+main{max-width:760px;margin:auto;padding:16px 14px 32px}.top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}
+h1{font-size:22px;margin:0}.sub{color:#666;font-size:13px}.tabs{display:flex;gap:8px;margin:12px 0}.tabs button,.btn{border:1px solid #bbb;background:#fff;border-radius:10px;padding:11px 14px;font-weight:700;min-height:44px}
+.tabs .on,.primary{background:#292929;color:#fff;border-color:#292929}.panel{background:#fff;border:1px solid #ddd;border-radius:14px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:5px}input,select{width:100%;min-height:44px;border:1px solid #ccc;border-radius:9px;padding:9px;font-size:16px;background:#fff}
+button{cursor:pointer}.full{width:100%}.muted{font-size:13px;color:#666}.resultgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.result{font-size:24px;font-weight:800}.small{font-size:12px;color:#666}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:7px 4px;border-bottom:1px solid #ddd;text-align:left}td input{min-width:90px}
+.scroll{overflow-x:auto}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.hidden{display:none}.ok{color:#166534}.warn{color:#92400e}
+@media(max-width:520px){.grid3{grid-template-columns:1fr 1fr}.resultgrid{grid-template-columns:1fr}.top{align-items:flex-start}}
+</style>
+</head>
+<body>
+<main>
+<div class="top">
+ <div><h1>🪚 Cotizador Carpintería</h1><div class="sub">V2 · precios editables y guardados en el teléfono</div></div>
+ <button class="btn" id="installBtn" hidden>Instalar</button>
+</div>
+
+<div class="tabs">
+ <button id="cotTab" class="on">Cotizar</button>
+ <button id="preTab">Precios</button>
+</div>
+
+<section id="cotPanel" class="panel">
+ <div class="grid">
+  <div><label>Tipo de mueble</label><select id="tipo"><option>Clóset</option><option>Puerta</option><option>Cocina</option><option>Cama</option><option>Mesa</option><option>Mueble de almacenamiento</option><option>Otro</option></select></div>
+  <div><label>Complejidad</label><select id="complejidad"><option value="1">Sencillo</option><option value="1.15" selected>Estándar</option><option value="1.3">Complejo</option><option value="1.5">Muy complejo</option></select></div>
+ </div>
+ <div class="grid3" style="margin-top:10px">
+  <div><label>Ancho cm</label><input id="ancho" type="number" min="0" value="200"></div>
+  <div><label>Alto cm</label><input id="alto" type="number" min="0" value="200"></div>
+  <div><label>Profundidad cm</label><input id="prof" type="number" min="0" value="55"></div>
+ </div>
+ <div class="grid3" style="margin-top:10px">
+  <div><label>Cajones</label><input id="cajones" type="number" min="0" value="0"></div>
+  <div><label>Puertas</label><input id="puertas" type="number" min="0" value="0"></div>
+  <div><label>Módulos extra</label><input id="modulos" type="number" min="0" value="0"></div>
+ </div>
+ <div class="grid" style="margin-top:10px">
+  <div><label>Triplay económico — piezas</label><input id="tri29" type="number" min="0" step=".1" value="0"></div>
+  <div><label>Triplay puertas/closet — hojas</label><input id="tri300" type="number" min="0" step=".1" value="0"></div>
+ </div>
+ <div class="grid" style="margin-top:10px">
+  <div><label>Vigas — piezas</label><input id="vigas" type="number" min="0" step=".1" value="0"></div>
+  <div><label>Tubo — metros usados</label><input id="tuboM" type="number" min="0" step=".1" value="0"></div>
+ </div>
+ <div class="grid3" style="margin-top:10px">
+  <div><label>Horas propias</label><input id="horas" type="number" min="0" step=".5" value="16"></div>
+  <div><label>Horas ayudante</label><input id="hAyud" type="number" min="0" step=".5" value="0"></div>
+  <div><label>Pago ayudante $</label><input id="pAyud" type="number" min="0" value="0"></div>
+ </div>
+ <div class="grid" style="margin-top:10px">
+  <div><label>Otros materiales $</label><input id="otros" type="number" min="0" value="0"></div>
+  <div><label>Acabado</label><select id="acabado"><option value="0">Sin acabado</option><option value="100">Sellado</option><option value="180">Barniz / normal</option><option value="250">Color convencional</option><option value="400">Negro / difícil</option></select></div>
+ </div>
+ <div class="grid3" style="margin-top:10px">
+  <div><label>Instalación $</label><input id="instalacion" type="number" min="0" value="0"></div>
+  <div><label>Tu tarifa $/h</label><input id="tarifa" type="number" min="0" value="125"></div>
+  <div><label>Gastos/merma %</label><input id="gastos" type="number" min="0" value="8"></div>
+ </div>
+ <div class="grid" style="margin-top:10px">
+  <div><label>Utilidad %</label><input id="utilidad" type="number" min="0" value="20"></div>
+  <div><label>Descuento al cliente %</label><input id="descuento" type="number" min="0" max="100" value="0"></div>
+ </div>
+ <button class="btn primary full" id="calc" style="margin-top:14px">CALCULAR PRECIO</button>
+ <div id="resultado" style="margin-top:14px"></div>
+</section>
+
+<section id="prePanel" class="panel hidden">
+ <p class="muted">Cambia precio de compra y cantidad del paquete. El costo unitario se calcula automáticamente.</p>
+ <div class="scroll"><table><thead><tr><th>Material</th><th>Compra $</th><th>Cantidad</th><th>Unidad</th><th>Unitario</th></tr></thead><tbody id="priceBody"></tbody></table></div>
+ <div class="actions"><button class="btn primary" id="savePrices">Guardar precios</button><button class="btn" id="resetPrices">Restaurar</button></div>
+ <p id="saveMsg" class="muted"></p>
+</section>
+
+<section class="panel">
+ <b>Uso como app en Android</b>
+ <p class="muted">Esta versión guarda los precios en el navegador. Cuando la publiques en una dirección HTTPS, Chrome podrá instalarla en la pantalla de inicio como una PWA.</p>
+</section>
+</main>
+<script>
+const DEFAULTS={
+tri29:{n:"Triplay económico",p:29,q:1,u:"pieza"},tri300:{n:"Triplay puertas/closet",p:300,q:1,u:"hoja"},
+vigas:{n:"Viga 85×15×7 cm",p:25,q:1,u:"pieza"},pijas:{n:"Pijas normales",p:140,q:1,u:"kg"},
+pijasPuerta:{n:"Pijas 3×14 para puertas",p:160,q:1,u:"kg"},grapas:{n:"Grapas calibre 18",p:210,q:1,u:"caja"},
+thinner:{n:"Thinner",p:35,q:1,u:"litro"},sellador:{n:"Sellador",p:165,q:1,u:"litro"},
+brillo:{n:"Brillo directo + catalizador",p:480,q:1,u:"kit"},jaladeras:{n:"Jaladeras",p:500,q:100,u:"pieza"},
+bisagras:{n:"Bisagras (par)",p:30,q:1,u:"par"},correderas:{n:"Correderas telescópicas (par)",p:59,q:1,u:"par"},
+carretillas:{n:"Carretillas de closet (par)",p:50,q:1,u:"par"},riel:{n:"Riel doble T 3 m",p:320,q:3,u:"metro"},
+tubo:{n:"Tubo 3 m",p:160,q:3,u:"metro"},manija:{n:"Manija embutida",p:20,q:1,u:"pieza"},
+cerradura:{n:"Cerradura",p:160,q:1,u:"pieza"},tabla250:{n:"Tabla/board para puerta",p:250,q:1,u:"pieza"},
+bisagraPuerta:{n:"Bisagras puerta (par)",p:40,q:1,u:"par"}
+};
+let prices=JSON.parse(localStorage.getItem("cotizadorCarpinteriaV2")||"null")||structuredClone(DEFAULTS);
+const $=id=>document.getElementById(id), money=n=>"$"+(Number(n)||0).toLocaleString("es-MX",{minimumFractionDigits:2,maximumFractionDigits:2});
+function renderPrices(){ $("priceBody").innerHTML=""; Object.entries(prices).forEach(([k,x])=>{let tr=document.createElement("tr");tr.innerHTML=`<td>${x.n}</td><td><input data-k="${k}" data-f="p" type="number" min="0" step=".01" value="${x.p}"></td><td><input data-k="${k}" data-f="q" type="number" min=".001" step=".001" value="${x.q}"></td><td>${x.u}</td><td id="u-${k}">${money(x.p/x.q)}</td>`;$("priceBody").appendChild(tr)});$("priceBody").querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{let k=i.dataset.k;prices[k][i.dataset.f]=Math.max(0,Number(i.value)||0);$("u-"+k).textContent=money(prices[k].p/Math.max(.001,prices[k].q))}))}
+renderPrices();
+$("cotTab").onclick=()=>{$("cotPanel").classList.remove("hidden");$("prePanel").classList.add("hidden");$("cotTab").classList.add("on");$("preTab").classList.remove("on")};
+$("preTab").onclick=()=>{$("prePanel").classList.remove("hidden");$("cotPanel").classList.add("hidden");$("preTab").classList.add("on");$("cotTab").classList.remove("on")};
+$("savePrices").onclick=()=>{localStorage.setItem("cotizadorCarpinteriaV2",JSON.stringify(prices));$("saveMsg").textContent="✓ Precios guardados en este teléfono.";};
+$("resetPrices").onclick=()=>{prices=structuredClone(DEFAULTS);renderPrices();$("saveMsg").textContent="Precios restaurados.";};
+function n(id){return Math.max(0,Number($(id).value)||0)}
+$("calc").onclick=()=>{
+ let material=n("tri29")*prices.tri29.p/prices.tri29.q+n("tri300")*prices.tri300.p/prices.tri300.q+n("vigas")*prices.vigas.p/prices.vigas.q+n("tuboM")*prices.tubo.p/prices.tubo.q+n("otros");
+ let hardware=n("puertas")*prices.bisagras.p/prices.bisagras.q+n("cajones")*prices.correderas.p/prices.correderas.q+n("puertas")*prices.jaladeras.p/prices.jaladeras.q;
+ let factor=Number($("complejidad").value)||1, labor=n("horas")*n("tarifa")*factor, ayud=n("pAyud"), acabado=n("acabado"), instal=n("instalacion");
+ let base=material+hardware+labor+ayud+acabado+instal, gastos=base*n("gastos")/100, costo=base+gastos, utilidad=costo*n("utilidad")/100;
+ let recomendado=costo+utilidad, descuento=Math.min(100,n("descuento")), venta=descuento?recomendado/(1-descuento/100):recomendado, alto=recomendado*1.12;
+ $("resultado").innerHTML=`<div class="resultgrid"><div class="panel"><div class="small">Costo mínimo</div><div class="result">${money(costo)}</div></div><div class="panel"><div class="small">Precio recomendado</div><div class="result">${money(recomendado)}</div></div><div class="panel"><div class="small">Precio alto</div><div class="result">${money(alto)}</div></div></div><div class="panel"><b>Si quieres dar ${descuento}% de descuento:</b><div class="result">${money(venta)}</div><p class="muted">Material + herrajes: ${money(material+hardware)} · Tu mano de obra: ${money(labor)} · Ayudante: ${money(ayud)} · Acabado: ${money(acabado)} · Instalación: ${money(instal)} · Gastos/merma: ${money(gastos)}</p></div>`;
+};
+$("calc").click();
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").hidden=false});
+$("installBtn").onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").hidden=true};
+if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+</script>
+</body>
+</html>
